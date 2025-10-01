@@ -1,20 +1,22 @@
 ﻿using System;
 using System.Diagnostics;
-using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Platform.Storage;
+using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using ScreenshotsTimer.Data;
+using ScreenshotsTimer.Domain;
 
-namespace ScreenshotsTimer.ViewModels;
+namespace ScreenshotsTimer.Presentation.ViewModels;
 
 public partial class MainViewModel : ObservableObject
 {
     private readonly Storage _storage = new();
-
-    private readonly FastScreenCapture _fastScreenCapture = new();
+    private readonly WorkTimer _workTimer = new();
+    private Timer _timer;
 
     [ObservableProperty] private string? _folderPath;
 
@@ -24,25 +26,13 @@ public partial class MainViewModel : ObservableObject
 
     [ObservableProperty] private bool _isLoading;
 
-    private TimeSpan _time;
-
-    private TimeSpan Time
-    {
-        get => _time;
-        set
-        {
-            _time = value;
-
-            OnPropertyChanged(nameof(TimerText));
-        }
-    }
-
-    public string TimerText => _time.ToString(@"hh\:mm\:ss");
+    public string TimerText => _workTimer.WorkTime.ToString(@"hh\:mm\:ss");
 
     public MainViewModel()
     {
         _folderPath = _storage.GetLastFolder();
     }
+
 
     [RelayCommand]
     private async Task SetFolder(Window window)
@@ -67,7 +57,7 @@ public partial class MainViewModel : ObservableObject
 
     partial void OnFolderPathChanged(string? value)
     {
-        StartCommand.NotifyCanExecuteChanged();
+        TogglePlayPauseCommand.NotifyCanExecuteChanged();
         GetScreenshotCommand.NotifyCanExecuteChanged();
         OpenFolderInNativeExplorerCommand.NotifyCanExecuteChanged();
     }
@@ -91,67 +81,71 @@ public partial class MainViewModel : ObservableObject
         }
     }
 
-    private bool CanStart() => !IsRunning && !string.IsNullOrEmpty(FolderPath);
+    private bool CanTogglePlayPause() => !string.IsNullOrEmpty(FolderPath);
 
 
-    [RelayCommand(CanExecute = nameof(CanStart))]
-    private async Task Start()
+    [RelayCommand(CanExecute = nameof(CanTogglePlayPause))]
+    private void TogglePlayPause()
     {
-        IsRunning = true;
-
-        Time = TimeSpan.Zero;
-
-        while (IsRunning)
+        if (IsRunning)
         {
             if (IsPaused)
-            {
-                await Task.Delay(1000);
-                continue;
-            }
-
-            Time += TimeSpan.FromMinutes(1);
-
-            await GetScreenshot();
-
-            await Task.Delay(TimeSpan.FromMinutes(1));
+                Continue();
+            else
+                Pause();
+        }
+        else
+        {
+            Start();
         }
     }
 
-    [RelayCommand]
-    private async Task Stop()
+    private void Start()
     {
-        IsRunning = false;
+        IsRunning = true;
+
+        _workTimer.Start(TimeSpan.FromMinutes(1), FolderPath!);
+
+        CreateTimer();
     }
 
-    private bool CanPause() => IsRunning && !IsPaused;
+    private void Pause()
+    {
+        IsPaused = true;
 
-    private bool CanContinue() => IsRunning && IsPaused;
+        _workTimer.Pause();
+        _timer.Dispose();
+    }
+
+    private void Continue()
+    {
+        IsPaused = false;
+
+        _workTimer.Resume();
+
+        CreateTimer();
+    }
+
+    [RelayCommand]
+    private void Stop()
+    {
+        IsRunning = false;
+
+        _workTimer.Stop();
+        _timer.Dispose();
+    }
+
+    private void CreateTimer()
+    {
+        _timer = new Timer(_ => { Dispatcher.UIThread.Invoke(() => OnPropertyChanged(nameof(TimerText))); }, null,
+            TimeSpan.Zero, TimeSpan.FromMilliseconds(500));
+    }
 
     partial void OnIsRunningChanged(bool value)
     {
-        StartCommand.NotifyCanExecuteChanged();
         GetScreenshotCommand.NotifyCanExecuteChanged();
-        PauseCommand.NotifyCanExecuteChanged();
-        ContinueCommand.NotifyCanExecuteChanged();
     }
 
-    partial void OnIsPausedChanged(bool value)
-    {
-        PauseCommand.NotifyCanExecuteChanged();
-        ContinueCommand.NotifyCanExecuteChanged();
-    }
-
-    [RelayCommand(CanExecute = nameof(CanPause))]
-    private async Task Pause()
-    {
-        IsPaused = true;
-    }
-
-    [RelayCommand(CanExecute = nameof(CanContinue))]
-    private async Task Continue()
-    {
-        IsPaused = false;
-    }
 
     private bool CanGetScreenshot() => !IsLoading && !string.IsNullOrEmpty(FolderPath);
 
@@ -165,16 +159,7 @@ public partial class MainViewModel : ObservableObject
     {
         IsLoading = true;
 
-        string nowFolder = $"{DateTime.Now:dd_MM_yyyy}";
-
-        string targetFolder = Path.Combine(FolderPath, nowFolder);
-
-        if (!Directory.Exists(targetFolder))
-        {
-            Directory.CreateDirectory(targetFolder);
-        }
-
-        await _fastScreenCapture.CaptureJpegAsync(Path.Combine(targetFolder, $"{DateTime.Now:HH_mm_ss_fff}.jpg"));
+        await _workTimer.GetScreenshot(FolderPath!);
 
         IsLoading = false;
     }

@@ -1,11 +1,10 @@
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
-using Avalonia.Data.Core;
 using Avalonia.Data.Core.Plugins;
 using System.Linq;
 using Avalonia.Markup.Xaml;
-using ScreenshotsTimer.ViewModels;
-using ScreenshotsTimer.Views;
+using ScreenshotsTimer.Presentation.ViewModels;
+using ScreenshotsTimer.Presentation.Views;
 
 namespace ScreenshotsTimer;
 

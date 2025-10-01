@@ -1,0 +1,81 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:viewModels="clr-namespace:ScreenshotsTimer.Presentation.ViewModels"
+             xmlns:presentation="clr-namespace:ScreenshotsTimer.Presentation"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="ScreenshotsTimer.Presentation.Views.MainView"
+             x:DataType="viewModels:MainViewModel">
+
+    <Grid RowDefinitions="Auto Auto Auto *"
+          Margin="24">
+
+        <ProgressBar IsIndeterminate="True"
+                     Height="10"
+                     IsVisible="{Binding IsLoading}"
+                     Grid.Row="0" />
+
+
+        <StackPanel Grid.Row="2" Spacing="16" Orientation="Vertical">
+
+            <Grid ColumnDefinitions="* Auto">
+
+                <Grid ColumnDefinitions="Auto Auto">
+                    <TextBlock Text="{Binding FolderPath}"
+                               VerticalAlignment="Center" />
+
+                    <Button Grid.Column="1"
+                            Margin="16 0"
+                            Content="Set Folder"
+                            Command="{Binding SetFolderCommand}"
+                            CommandParameter="{Binding $parent[Window]}" />
+                </Grid>
+
+
+                <Button Grid.Column="1"
+                        Content="Open Folder in Explorer"
+                        Command="{Binding OpenFolderInNativeExplorerCommand}" />
+            </Grid>
+
+            <Grid ColumnDefinitions="* *">
+                <Button HorizontalAlignment="Stretch"
+                        HorizontalContentAlignment="Center"
+                        VerticalAlignment="Center"
+                        Command="{Binding TogglePlayPauseCommand}">
+                    <Button.Content>
+                        <MultiBinding Converter="{presentation:PlayPauseButtonContentConverter}">
+                            <Binding Path="IsRunning" />
+                            <Binding Path="IsPaused" />
+                        </MultiBinding>
+                    </Button.Content>
+                </Button>
+
+                <Button Grid.Column="1"
+                        Margin="16 0 0 0"
+                        Content="Stop"
+                        IsEnabled="{Binding IsRunning}"
+                        HorizontalAlignment="Stretch"
+                        HorizontalContentAlignment="Center"
+                        VerticalAlignment="Center"
+                        Command="{Binding StopCommand}" />
+            </Grid>
+
+
+            <Button Content="Get Screenshot"
+                    HorizontalAlignment="Stretch"
+                    HorizontalContentAlignment="Center"
+                    VerticalAlignment="Center"
+                    Command="{Binding GetScreenshotCommand}" />
+
+        </StackPanel>
+
+
+        <TextBlock Grid.Row="3"
+                   Text="{Binding TimerText}"
+                   FontSize="80"
+                   VerticalAlignment="Center"
+                   HorizontalAlignment="Center" />
+    </Grid>
+
+</UserControl>

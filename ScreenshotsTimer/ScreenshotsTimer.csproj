@@ -25,4 +25,9 @@
         <PackageReference Include="ScreenCapture.NET.DX11" />
         <PackageReference Include="SixLabors.ImageSharp" />
     </ItemGroup>
+
+    <ItemGroup>
+      <AdditionalFiles Include="Presentation\Views\MainView.axaml" />
+      <AdditionalFiles Include="Presentation\Views\MainWindow.axaml" />
+    </ItemGroup>
 </Project>

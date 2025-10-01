@@ -2,14 +2,14 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:views="clr-namespace:ScreenshotsTimer.Views"
+        xmlns:views="clr-namespace:ScreenshotsTimer.Presentation.Views"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-        x:Class="ScreenshotsTimer.Views.MainWindow"
+        x:Class="ScreenshotsTimer.Presentation.Views.MainWindow"
         Icon="/Assets/logo.ico"
         
         Title="Screenshots Timer"
         
-        Width="1024" Height="720"
+        Width="720" Height="480"
         MinWidth="720" MinHeight="480"
 
         WindowStartupLocation="CenterScreen">
