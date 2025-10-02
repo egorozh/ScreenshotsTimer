@@ -8,7 +8,11 @@
              x:Class="ScreenshotsTimer.Presentation.Views.MainView"
              x:DataType="viewModels:MainViewModel">
 
-    <Grid RowDefinitions="Auto Auto Auto *"
+    <Design.DataContext>
+        <viewModels:MainViewModel />
+    </Design.DataContext>
+
+    <Grid RowDefinitions="Auto Auto Auto * Auto"
           Margin="24">
 
         <ProgressBar IsIndeterminate="True"
@@ -37,45 +41,67 @@
                         Content="Open Folder in Explorer"
                         Command="{Binding OpenFolderInNativeExplorerCommand}" />
             </Grid>
+            
+        </StackPanel>
 
-            <Grid ColumnDefinitions="* *">
-                <Button HorizontalAlignment="Stretch"
+
+        <Grid Grid.Row="3"
+              VerticalAlignment="Center"
+              HorizontalAlignment="Center"
+              RowDefinitions="* Auto">
+            <TextBlock
+                Text="{Binding TimerText}"
+                FontSize="80" />
+
+            <Grid Grid.Row="1"
+                  RowDefinitions="* *"
+                  Width="200">
+                <Button Grid.Row="0"
+                        HorizontalAlignment="Stretch"
                         HorizontalContentAlignment="Center"
                         VerticalAlignment="Center"
-                        Command="{Binding TogglePlayPauseCommand}">
+                        CornerRadius="32"
+                        Padding="16 8"
+                        FontSize="32"
+                        FontWeight="Medium"
+                        Background="{DynamicResource AccentButtonBackground}"
+                        Command="{Binding ToggleStartStopCommand}">
                     <Button.Content>
-                        <MultiBinding Converter="{presentation:PlayPauseButtonContentConverter}">
+                        <MultiBinding Converter="{presentation:StartStopButtonContentConverter}">
                             <Binding Path="IsRunning" />
                             <Binding Path="IsPaused" />
                         </MultiBinding>
                     </Button.Content>
                 </Button>
 
-                <Button Grid.Column="1"
-                        Margin="16 0 0 0"
-                        Content="Stop"
-                        IsEnabled="{Binding IsRunning}"
+                <Button Grid.Row="1"
+                        Margin="0 16 0 0"
+                        Content="Reset"
+                        IsVisible="{Binding CanReset}"
                         HorizontalAlignment="Stretch"
                         HorizontalContentAlignment="Center"
                         VerticalAlignment="Center"
-                        Command="{Binding StopCommand}" />
+                        CornerRadius="32"
+                        Padding="16 8"
+                        FontSize="32"
+                        FontWeight="Medium"
+                        Command="{Binding ResetCommand}" />
+
             </Grid>
+        </Grid>
 
-
-            <Button Content="Get Screenshot"
-                    HorizontalAlignment="Stretch"
-                    HorizontalContentAlignment="Center"
-                    VerticalAlignment="Center"
-                    Command="{Binding GetScreenshotCommand}" />
-
-        </StackPanel>
-
-
-        <TextBlock Grid.Row="3"
-                   Text="{Binding TimerText}"
-                   FontSize="80"
-                   VerticalAlignment="Center"
-                   HorizontalAlignment="Center" />
+        
+        <Button Grid.Row="4" 
+                Content="Get Screenshot"
+                HorizontalAlignment="Center"
+                HorizontalContentAlignment="Center"
+                VerticalAlignment="Center"
+                CornerRadius="32"
+                Padding="16 8"
+                FontSize="32"
+                FontWeight="Medium"
+                Background="{DynamicResource ThemeAccentBrush3}"
+                Command="{Binding GetScreenshotCommand}" />
     </Grid>
 
 </UserControl>

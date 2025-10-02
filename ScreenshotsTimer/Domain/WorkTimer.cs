@@ -30,7 +30,13 @@ public class WorkTimer
         _timer = new Timer(_onTick, null, TimeSpan.Zero, _screenshotsPeriod);
     }
 
-    public void Stop() => _timer.Dispose();
+    public void Reset()
+    {
+        _timer.Dispose();
+        
+        _startWorkTime = DateTime.Now;
+        _pauseTimeCounter = TimeSpan.Zero;
+    }
 
     public void Pause()
     {

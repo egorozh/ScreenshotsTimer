@@ -6,7 +6,7 @@ using Avalonia.Markup.Xaml;
 
 namespace ScreenshotsTimer.Presentation;
 
-public class PlayPauseButtonContentConverter : MarkupExtension, IMultiValueConverter
+public class StartStopButtonContentConverter : MarkupExtension, IMultiValueConverter
 {
     public override object ProvideValue(IServiceProvider serviceProvider) => this;
 
@@ -15,7 +15,7 @@ public class PlayPauseButtonContentConverter : MarkupExtension, IMultiValueConve
         if (values is [bool isRunning, bool isPaused])
         {
             return isRunning
-                ? isPaused ? "Play" : "Pause"
+                ? isPaused ? "Start" : "Stop"
                 : "Start";
         }
 

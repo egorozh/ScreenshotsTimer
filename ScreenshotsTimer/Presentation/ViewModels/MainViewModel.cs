@@ -26,6 +26,8 @@ public partial class MainViewModel : ObservableObject
 
     [ObservableProperty] private bool _isLoading;
 
+    public bool CanReset => IsRunning || IsPaused;
+
     public string TimerText => _workTimer.WorkTime.ToString(@"hh\:mm\:ss");
 
     public MainViewModel()
@@ -57,7 +59,7 @@ public partial class MainViewModel : ObservableObject
 
     partial void OnFolderPathChanged(string? value)
     {
-        TogglePlayPauseCommand.NotifyCanExecuteChanged();
+        ToggleStartStopCommand.NotifyCanExecuteChanged();
         GetScreenshotCommand.NotifyCanExecuteChanged();
         OpenFolderInNativeExplorerCommand.NotifyCanExecuteChanged();
     }
@@ -85,7 +87,7 @@ public partial class MainViewModel : ObservableObject
 
 
     [RelayCommand(CanExecute = nameof(CanTogglePlayPause))]
-    private void TogglePlayPause()
+    private void ToggleStartStop()
     {
         if (IsRunning)
         {
@@ -102,37 +104,38 @@ public partial class MainViewModel : ObservableObject
 
     private void Start()
     {
-        IsRunning = true;
-
         _workTimer.Start(TimeSpan.FromMinutes(1), FolderPath!);
 
         CreateTimer();
+
+        IsRunning = true;
     }
 
     private void Pause()
     {
-        IsPaused = true;
-
         _workTimer.Pause();
         _timer.Dispose();
+
+        IsPaused = true;
     }
 
     private void Continue()
     {
-        IsPaused = false;
-
         _workTimer.Resume();
 
         CreateTimer();
+
+        IsPaused = false;
     }
 
     [RelayCommand]
-    private void Stop()
+    private void Reset()
     {
-        IsRunning = false;
-
-        _workTimer.Stop();
+        _workTimer.Reset();
         _timer.Dispose();
+
+        IsRunning = false;
+        IsPaused = false;
     }
 
     private void CreateTimer()
@@ -144,8 +147,15 @@ public partial class MainViewModel : ObservableObject
     partial void OnIsRunningChanged(bool value)
     {
         GetScreenshotCommand.NotifyCanExecuteChanged();
+
+        OnPropertyChanged(nameof(CanReset));
+        OnPropertyChanged(nameof(TimerText));
     }
 
+    partial void OnIsPausedChanged(bool value)
+    {
+        OnPropertyChanged(nameof(CanReset));
+    }
 
     private bool CanGetScreenshot() => !IsLoading && !string.IsNullOrEmpty(FolderPath);
 
