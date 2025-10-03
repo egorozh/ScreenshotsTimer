@@ -32,7 +32,7 @@ class _MyAppState extends State<MyApp> {
     // We also handle the message potentially returning null.
     try {
       platformVersion =
-          await _screenshotsNativePlugin.getPlatformVersion() ?? 'Unknown platform version';
+          await _screenshotsNativePlugin.takeScreenshot() ?? 'Unknown platform version';
     } on PlatformException {
       platformVersion = 'Failed to get platform version.';
     }

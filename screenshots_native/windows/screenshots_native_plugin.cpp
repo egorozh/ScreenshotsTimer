@@ -40,7 +40,7 @@ ScreenshotsNativePlugin::~ScreenshotsNativePlugin() {}
 void ScreenshotsNativePlugin::HandleMethodCall(
     const flutter::MethodCall<flutter::EncodableValue> &method_call,
     std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>> result) {
-  if (method_call.method_name().compare("getPlatformVersion") == 0) {
+  if (method_call.method_name().compare("takeScreenshot") == 0) {
     std::ostringstream version_stream;
     version_stream << "Windows ";
     if (IsWindows10OrGreater()) {

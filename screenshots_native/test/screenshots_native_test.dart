@@ -9,7 +9,7 @@ class MockScreenshotsNativePlatform
     implements ScreenshotsNativePlatform {
 
   @override
-  Future<String?> getPlatformVersion() => Future.value('42');
+  Future<String?> takeScreenshot() => Future.value('42');
 }
 
 void main() {
@@ -24,6 +24,6 @@ void main() {
     MockScreenshotsNativePlatform fakePlatform = MockScreenshotsNativePlatform();
     ScreenshotsNativePlatform.instance = fakePlatform;
 
-    expect(await screenshotsNativePlugin.getPlatformVersion(), '42');
+    expect(await screenshotsNativePlugin.takeScreenshot(), '42');
   });
 }
